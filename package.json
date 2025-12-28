@@ -1,0 +1,21 @@
+{
+  "name": "wedding-card-03",
+  "version": "1.0.0",
+  "description": "Wedding invitation web app",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongodb": "^7.0.0",
+    "mongoose": "^9.0.2",
+    "mysql2": "^3.16.0"
+  }
+}

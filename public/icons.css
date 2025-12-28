@@ -1,0 +1,133 @@
+.heart-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 30px;
+}
+.heart-divider .line {
+    width: 100px;
+    height: 2px;
+    background-color: #ffd34d;
+}
+.heart-divider .heart {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background-color: #ffd34d;
+    transform: rotate(-45deg);
+    animation: blink 2s infinite ease-in-out;
+}
+.heart-divider .heart::before,
+.heart-divider .heart::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #ffd34d;
+    border-radius: 50%;
+    animation: blink 2s infinite ease-in-out;
+}
+.heart-divider{
+      top: -15px;
+    left: 0;
+}
+ .heart::before {
+    top: -15px;
+    left: 0;
+}
+.heart-divider .heart::after {
+    left: 15px;
+    top: 0;
+}
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+.heart-pink {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background: pink;
+    transform: rotate(-45deg);
+    margin-top: 20px;
+}
+.heart-pink::before,
+.heart-pink::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: pink;
+    border-radius: 80%;
+}
+.heart-pink::before {
+    top: -10px;
+    left: 0;
+}
+.heart-pink::after {
+    left: 10px;
+    top: 0;
+}
+.scroll{
+    color: #ffd34d;
+    font-size: larger;
+    animation: move 2s infinite;
+}
+@keyframes move {
+    0%{
+        opacity: 1;
+    }
+    50%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+@media(max-width:900px){
+    .countdown{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:480px){
+    .title{
+        font-size:2.2rem;
+    }
+    .number{
+        font-size:2.8rem;
+    }
+}
+@media(max-width:500px){
+    .section h1{
+        font-size:2.3rem;
+    }
+}
+@media  (max-width: 980px) {
+    #godname{
+        margin-top: 100px;
+
+        /* margin-bottom: 40px; */
+    }
+    .date p{
+        font-size: 20px;
+    }
+    .name-div p{
+        font-size: 3rem;
+    }
+    .map{
+        width: 350px;
+        height: 300px;
+    }
+    #find{
+        margin-top: 180px;
+    }
+}
