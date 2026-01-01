@@ -1,25 +1,49 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-const fs = require("fs");
+const mongoose = require("mongoose");
 const path = require("path");
-require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
+/* =========================
+   MIDDLEWARE
+========================= */
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-const messagesFile = path.join(__dirname, "messages.json");
+/* =========================
+   DATABASE CONNECTION
+========================= */
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.error("❌ MongoDB Error:", err));
 
-// Ensure messages.json exists
-if (!fs.existsSync(messagesFile)) {
-  fs.writeFileSync(messagesFile, JSON.stringify([]));
-}
+/* =========================
+   MESSAGE SCHEMA
+========================= */
+const messageSchema = new mongoose.Schema({
+  firstname: { type: String, required: true },
+  lastname: { type: String, required: true },
+  message: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
 
-// Route: Submit form
+const Message = mongoose.model("Message", messageSchema);
+
+/* =========================
+   ROUTES
+========================= */
+
+// Home (optional)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Submit form
 app.post("/submit", async (req, res) => {
   try {
     const { firstname, lastname, message } = req.body;
@@ -28,46 +52,48 @@ app.post("/submit", async (req, res) => {
       return res.status(400).send("All fields are required");
     }
 
-    const messages = JSON.parse(fs.readFileSync(messagesFile, "utf8"));
-    const newMessage = {
-      firstname,
-      lastname,
-      message,
-      createdAt: new Date().toISOString()
-    };
-    messages.push(newMessage);
-    fs.writeFileSync(messagesFile, JSON.stringify(messages, null, 2));
+    await Message.create({ firstname, lastname, message });
 
-    console.log("✅ Message saved");
+    console.log("💌 Message saved");
     res.send("Message Sent Successfully!");
   } catch (err) {
-    console.error("❌ Save error:", err);
-    res.status(500).send("Error saving message");
+    console.error("❌ Error:", err);
+    res.status(500).send("Server error");
   }
 });
 
-// Route: View messages
-app.get("/messages", (req, res) => {
+// View messages (Admin page)
+app.get("/messages", async (req, res) => {
   try {
-    const messages = JSON.parse(fs.readFileSync(messagesFile, "utf8"));
+    const messages = await Message.find().sort({ createdAt: -1 });
 
-    let html = "<h1>Messages</h1><ul>";
+    let html = `
+      <h1>Wedding Wishes 💖</h1>
+      <style>
+        body { font-family: Arial; padding: 20px }
+        li { margin-bottom: 20px }
+      </style>
+      <ul>
+    `;
+
     messages.forEach(m => {
-      html += `<li>
-        <strong>${m.firstname} ${m.lastname}</strong><br/>
-        ${m.message}<br/>
-        <small>${m.createdAt}</small>
-      </li><hr/>`;
+      html += `
+        <li>
+          <strong>${m.firstname} ${m.lastname}</strong><br>
+          ${m.message}<br>
+          <small>${new Date(m.createdAt).toLocaleString()}</small>
+        </li><hr>
+      `;
     });
-    html += "</ul>";
 
+    html += "</ul>";
     res.send(html);
   } catch (err) {
-    res.status(500).send("Error fetching messages");
+    res.status(500).send("Error loading messages");
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+/* =========================
+   EXPORT FOR VERCEL
+========================= */
+module.exports = app;

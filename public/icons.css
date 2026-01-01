@@ -131,3 +131,137 @@
         margin-top: 180px;
     }
 }
+/* =========================
+   MOBILE RESPONSIVE FIX
+========================= */
+
+@media (max-width: 768px) {
+
+  /* HERO / FIRST PAGE */
+  .img-box {
+    height: auto;
+    min-height: 100vh;
+    padding: 20px;
+    width: 100vw;
+  }
+
+  #godname {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .date p {
+    font-size: 22px;
+    text-align: center;
+  }
+
+  .name-div p {
+    font-size: 2.8rem;
+    letter-spacing: 3px;
+  }
+
+  .timedate p {
+    font-size: 18px;
+    margin-top: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  /* SECOND PAGE (COUNTDOWN) */
+  .secondpage {
+    height: auto;
+    padding: 40px 10px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .countdown {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .box {
+    padding: 25px 10px;
+  }
+
+  .number {
+    font-size: 2.5rem;
+  }
+
+  /* EVENTS SECTION */
+  .section h1 {
+    font-size: 2.5rem;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .card-img {
+    height: 220px;
+  }
+
+  .card-title {
+    font-size: 1.4rem;
+  }
+
+  .info {
+    font-size: 1rem;
+    gap: 10px;
+  }
+
+  /* MUSIC BUTTON */
+  .music-box {
+    width: 90px;
+    font-size: 14px;
+  }
+
+  /* MAP */
+  .map {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .map iframe {
+    width: 100%;
+    height: 260px;
+    border-radius: 12px;
+  }
+
+  /* FORM */
+  #msg {
+    font-size: 22px;
+    margin-top: 60px;
+  }
+
+  .form-wrapper {
+    width: 100%;
+    padding: 20px;
+  }
+
+  input,
+  textarea {
+    font-size: 14px;
+  }
+
+  .submit-btn {
+    font-size: 16px;
+    padding: 14px;
+  }
+
+  /* FOOTER */
+  .fivepage {
+    height: auto;
+    flex-direction: column;
+    padding: 20px;
+    font-size: 22px;
+  }
+
+  .madeby {
+    font-size: 16px;
+    padding-bottom: 15px;
+  }
+}
