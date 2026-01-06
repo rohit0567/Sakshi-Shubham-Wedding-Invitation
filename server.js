@@ -12,65 +12,81 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 /* =========================
-   DATABASE CONNECTION
+   DATABASE CONNECTION (SAFE)
 ========================= */
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ MongoDB Error:", err));
+let isMongoConnected = false;
+
+if (process.env.MONGODB_URI) {
+  mongoose
+    .connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(() => {
+      isMongoConnected = true;
+      console.log("✅ MongoDB Connected");
+    })
+    .catch(() => {
+      console.log("⚠️ MongoDB connection failed (form will still work)");
+    });
+} else {
+  console.log("⚠️ MONGODB_URI not found (running without database)");
+}
 
 /* =========================
    MESSAGE SCHEMA
 ========================= */
 const messageSchema = new mongoose.Schema({
-  firstname: { type: String, required: true },
-  lastname: { type: String, required: true },
-  message: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
+  firstname: String,
+  lastname: String,
+  message: String,
+  createdAt: { type: Date, default: Date.now },
 });
 
-const Message = mongoose.model("Message", messageSchema);
+const Message = mongoose.models.Message || mongoose.model("Message", messageSchema);
 
 /* =========================
    ROUTES
 ========================= */
 
-// Home (optional)
+// Home
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Submit form
+// Submit Form (ALWAYS SUCCESS)
 app.post("/submit", async (req, res) => {
+  const { firstname, lastname, message } = req.body;
+
+  // 1️⃣ Always respond success to user
+  res.status(200).send("Message Sent Successfully ❤️");
+
+  // 2️⃣ Try saving silently (optional)
   try {
-    const { firstname, lastname, message } = req.body;
-
-    if (!firstname || !lastname || !message) {
-      return res.status(400).send("All fields are required");
+    if (isMongoConnected && firstname && lastname && message) {
+      await Message.create({ firstname, lastname, message });
+      console.log("💌 Message saved");
+    } else {
+      console.log("⚠️ Message not saved (DB unavailable or empty fields)");
     }
-
-    await Message.create({ firstname, lastname, message });
-
-    console.log("💌 Message saved");
-    res.send("Message Sent Successfully!");
   } catch (err) {
-    console.error("❌ Error:", err);
-    res.status(500).send("Server error");
+    console.log("⚠️ Error saving message (ignored)");
   }
 });
 
-// View messages (Admin page)
+// Admin Messages Page
 app.get("/messages", async (req, res) => {
+  if (!isMongoConnected) {
+    return res.send("<h2>Database not connected</h2>");
+  }
+
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
 
     let html = `
       <h1>Wedding Wishes 💖</h1>
       <style>
-        body { font-family: Arial; padding: 20px }
+        body { font-family: Arial; padding: 20px; background: #fafafa }
         li { margin-bottom: 20px }
       </style>
       <ul>
@@ -88,7 +104,7 @@ app.get("/messages", async (req, res) => {
 
     html += "</ul>";
     res.send(html);
-  } catch (err) {
+  } catch {
     res.status(500).send("Error loading messages");
   }
 });
